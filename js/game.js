@@ -31,6 +31,7 @@ const RIGHT = 3;
 
 var update = null;
 var load_level = null;
+var move_player = null;
 
 function initGame()
 {
@@ -165,6 +166,11 @@ function initGame()
 	tiles[HEDGE_WEST] = loadSprite("assets/HedgeLeft.png");
 	tiles[FINISH] = loadSprite("assets/Finish.png");
 
+	var player = [
+		loadSprite("assets/PlayerLeft.png"),
+		loadSprite("assets/PlayerRight.png"),
+	];
+
 	var status_x = 0;
 	var status_y = 0;
 
@@ -179,8 +185,9 @@ function initGame()
 
 	var level = "level0";
 	var next_level = null;
-	var start_x = 0;
-	var start_y = 0;
+	var player_x = 0;
+	var player_y = 0;
+	var player_dir = 0;
 	var finish_x = grid_width - 1;
 	var finish_y = grid_height - 1;
 	var world = null;
@@ -234,7 +241,7 @@ function initGame()
 			{
 				var cell = getCell(x, y, 0, 0);
 				var critter = null;
-				if (cell == 's') { start_x = x; start_y = y; }
+				if (cell == 's') { player_x = x; player_y = y; }
 				else if (cell == 'f') { finish_x = x; finish_y = y; }
 				else
 				{
@@ -260,10 +267,39 @@ function initGame()
 				};
 			}
 		}
-
-	};
+	}
 	
 	load_level(level);
+
+	move_player = function(x, y)
+	{
+		var cell = world[player_x + player_y * grid_width];
+		if (x < 0 && contains(cell.dirs, LEFT)) { player_x = player_x - 1; player_dir = 0; }
+		if (x > 0 && contains(cell.dirs, RIGHT)) { player_x = player_x + 1; player_dir = 1; }
+		if (y < 0 && contains(cell.dirs, UP)) { player_y = player_y - 1; }
+		if (y > 0 && contains(cell.dirs, DOWN)) { player_y = player_y + 1; }
+	}
+
+	document.onkeypress = function(event)
+	{
+		var key = String.fromCharCode(event.which);
+
+		switch (key)
+		{
+			case 'w':
+				move_player(0, -1);
+				break;
+			case 's':
+				move_player(0, 1);
+				break;
+			case 'a':
+				move_player(-1, 0);
+				break;
+			case 'd':
+				move_player(1, 0);
+				break;
+		};
+	}
 
 	update = function()
 	{
@@ -304,6 +340,7 @@ function initGame()
 			}
 		}
 		ctx.drawImage(tiles[FINISH], finish_x * 32, finish_y * 32, 32, 32);
+		ctx.drawImage(player[player_dir], player_x * 32, player_y * 32, 32, 32);
 		ctx.translate(-grid_x, -grid_y);
 
 		ctx.translate(inventory_x, inventory_y);
