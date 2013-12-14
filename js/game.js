@@ -5,6 +5,16 @@ function loadSprite(url)
 	return o;
 }
 
+function contains(array, val)
+{
+	const count = array.length;
+	for (var i = 0; i < count; ++i)
+	{
+		if (array[i] == val) { return true; }
+	}
+	return false;
+}
+
 const PLAIN = 0;
 const BLOCKAGE = 1;
 const CLIFF = 2;
@@ -35,53 +45,72 @@ function initGame()
 			"name" : "Bee Gull",
 			"bribe" : "honeyfries",
 			"sprite" : loadSprite("assets/BeeGull.png"),
+			"key" : '0',
 		},
 		"bunnybear" : {
 			"name" : "Bunny Bear",
 			"bribe" : "salmondom",
-			"sprite" : loadSprite("assets/Salmondom.png"),
+			"sprite" : loadSprite("assets/BunnyBear.png"),
+			"key" : '1',
 		},
 		"fennecbox" : {
 			"name" : "Fennec Box",
 			"bribe" : "jumboqtip",
-			"sprite" : loadSprite("assets/JumboQTip.png"),
+			"sprite" : loadSprite("assets/FennecBox.png"),
+			"key" : '2',
 		},
 		"flamingowl" : {
 			"name" : "Flamingowl",
 			"bribe" : "threebrinedmice",
-			"sprite" : loadSprite("assets/ThreeBrinedMice.png"),
+			"sprite" : loadSprite("assets/Flamingowl.png"),
+			"key" : '3',
 		},
 		"hovershrew" : {
 			"name" : "Hover Shrew",
 			"bribe" : "plutonium",
 			"sprite" : loadSprite("assets/Hovershrew.png"),
+			"key" : '4',
 		},
 		"Molarbear" : {
 			"name" : "Molar Bear",
 			"bribe" : "glacierminttoothpaste",
 			"sprite" : loadSprite("assets/MolarBear.png"),
+			"key" : '5',
 		},
 		"owlrus" : {
 			"name" : "Owlrus",
 			"bribe" : "placeholder1",
 			"sprite" : loadSprite("assets/Owlrus.png"),
+			"key" : '6',
 		},
 		"polebat" : {
 			"name" : "Polebat",
 			"bribe" : "placeholder2",
 			"sprite" : loadSprite("assets/Polebat.png"),
+			"key" : '7',
 		},
 		"wartfrog" : {
 			"name" : "Wartfrog",
 			"bribe" : "bluebottletruffle",
 			"sprite" : loadSprite("assets/Wartfrog.png"),
+			"key" : '8',
 		},
 		"westernmeadowshark" : {
 			"name" : "Western Meadow Shark",
 			"bribe" : "placeholder3",
 			"sprite" : loadSprite("assets/WesternMeadowShark.png"),
+			"key" : '9',
 		},
 	};
+
+	var critterFromKey = function(key)
+	{
+		for (var c in creatures)
+		{
+			if (creatures[c].key == key) { return c; }
+		}
+		return null;
+	}
 
 	var bribes = {
 		"honeyfries" : {
@@ -163,17 +192,26 @@ function initGame()
 		next_level = null;
 		world = new Array();
 
-		for (var y = 0; y < grid_height; ++y)
+		// Strip blank lines, newlines and leading whitespace from the map data
+		var mapdata = "";
+		var readLine = function(data)
 		{
-			for (var x = 0; x < grid_width; ++x)
+			var idx = 0;
+
+			while (data[idx] == '\t' || data[idx] == ' ' || data[idx] == '\n') { ++idx; };	// Trim leading whitespace
+			if (idx >= data.length) { return ""; }
+			while (data[idx] != '\n')
 			{
-				world[x + y * grid_width] = {
-					"dirs" : [],
-					"cliff" : false,
-					"guardian" : null,
-				};
+				mapdata = mapdata + data[idx++];
 			}
+
+			return data.substr(idx + 1);
 		}
+		do
+		{
+			data = readLine(data);
+		}
+		while (data.length > 0);
 
 		var addDir = function(x, y, dir)
 		{
@@ -183,77 +221,46 @@ function initGame()
 			}
 		}
 
-		var y = -1;
-		var between_y = true;
-		var parseLine = function(data)
+		var getCell = function(cellx, celly, offsetx, offsety)
 		{
-			var idx = 0;
-			var x = -1;
+			var index = cellx * 2 + 1 + (grid_width * 2 + 1) * (celly * 2 + 1);
 
-			while (data[idx] == '\t' || data[idx] == ' ' || data[idx] == '\n') { ++idx; };	// Trim leading whitespace
-
-			if (idx >= data.length) { return ""; }
-
-			if (between_y)
-			{
-				while (data[idx] != '\n')
-				{
-					if (data[idx] == '+')
-					{
-						++x;
-					}
-					else if (data[idx] == '|')
-					{
-						addDir(x, y, DOWN);
-						addDir(x, y + 1, UP);
-					}
-					else if (data[idx] == '-')
-					{
-						// Remove dir?
-					}
-					++idx;
-				}
-				++y;
-				between_y = false;
-			}
-			else
-			{
-				while (data[idx] != '\n')
-				{
-					if (data[idx] == 's')
-					{
-						start_x = x;
-						start_y = y;
-					}
-					else if (data[idx] == 'f')
-					{
-						finish_x = x;
-						finish_y = y;
-					}
-					else if (data[idx] == '|')
-					{
-						// Remove dir?
-						++x;
-					}
-					else if (data[idx] == '-')
-					{
-						addDir(x - 1, y, RIGHT);
-						addDir(x, y, LEFT);
-						++x;
-					}
-					++idx;
-				}
-				between_y = true;
-			}
-
-			return data.substr(idx + 1);
+			return mapdata[index + offsetx + (grid_width * 2 + 1) * offsety];
 		}
 
-		do
+		for (var y = 0; y < grid_height; ++y)
 		{
-			data = parseLine(data);
+			for (var x = 0; x < grid_width; ++x)
+			{
+				var cell = getCell(x, y, 0, 0);
+				var critter = null;
+				if (cell == 's') { start_x = x; start_y = y; }
+				else if (cell == 'f') { finish_x = x; finish_y = y; }
+				else
+				{
+					critter = critterFromKey(cell);
+					if (critter)
+					{
+						critter = creatures[critter];
+					}
+				}
+
+				var dirs = new Array();
+				if (getCell(x, y, -1, 0) != '|') { dirs = dirs.concat(LEFT); }
+				if (getCell(x, y, 1, 0) != '|') { dirs = dirs.concat(RIGHT); }
+				if (getCell(x, y, 0, -1) != '-') { dirs = dirs.concat(UP); }
+				if (getCell(x, y, 0, 1) != '-') { dirs = dirs.concat(DOWN); }
+
+				console.log("X: " + x + " Y: " + y + " Cell: " + cell + " Left: " + getCell(x, y, -1, 0) + " Right: " + getCell(x, y, 1, 0) + " Up: " + getCell(x, y, 0, -1) + " Down: " + getCell(x, y, 0, 1) + " Dirs: " + dirs);
+			
+				world[x + y * grid_width] = {
+					"dirs" : dirs,
+					"cliff" : cell == 'c',
+					"guardian" : critter,
+				};
+			}
 		}
-		while (data.length > 0);
+
 	};
 	
 	load_level(level);
@@ -272,10 +279,10 @@ function initGame()
 				cell = world[x + y * grid_width];
 
 				var blocked = true;
-				if (UP in cell.dirs) { blocked = false; }
-				if (DOWN in cell.dirs) { blocked = false; }
-				if (LEFT in cell.dirs) { blocked = false; }
-				if (RIGHT in cell.dirs) { blocked = false; }
+				if (contains(cell.dirs, UP)) { blocked = false; }
+				if (contains(cell.dirs, DOWN)) { blocked = false; }
+				if (contains(cell.dirs, LEFT)) { blocked = false; }
+				if (contains(cell.dirs, RIGHT)) { blocked = false; }
 
 				if (blocked)
 				{
@@ -284,11 +291,15 @@ function initGame()
 				else
 				{
 					ctx.drawImage(tiles[PLAIN], x * 32, y * 32, 32, 32);
-					if (!(UP in cell.dirs)) { ctx.drawImage(tiles[HEDGE_NORTH], x * 32, y * 32, 32, 32); }
-					if (!(DOWN in cell.dirs)) { ctx.drawImage(tiles[HEDGE_SOUTH], x * 32, y * 32, 32, 32); }
-					if (!(LEFT in cell.dirs)) { ctx.drawImage(tiles[HEDGE_WEST], x * 32, y * 32, 32, 32); }
-					if (!(RIGHT in cell.dirs)) { ctx.drawImage(tiles[HEDGE_EAST], x * 32, y * 32, 32, 32); }
+					if (!contains(cell.dirs, UP)) { ctx.drawImage(tiles[HEDGE_NORTH], x * 32, y * 32, 32, 32); }
+					if (!contains(cell.dirs, DOWN)) { ctx.drawImage(tiles[HEDGE_SOUTH], x * 32, y * 32, 32, 32); }
+					if (!contains(cell.dirs, LEFT)) { ctx.drawImage(tiles[HEDGE_WEST], x * 32, y * 32, 32, 32); }
+					if (!contains(cell.dirs, RIGHT)) { ctx.drawImage(tiles[HEDGE_EAST], x * 32, y * 32, 32, 32); }
 					if (cell.cliff) { ctx.drawImage(tiles[CLIFF], x * 32, y * 32, 32, 32); }
+					if (cell.guardian != null)
+					{
+						ctx.drawImage(cell.guardian.sprite, x * 32, y * 32, 32, 32);
+					}
 				}
 			}
 		}
