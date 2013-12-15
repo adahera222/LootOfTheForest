@@ -199,19 +199,22 @@ function initGame()
 	var grid_width = 16;
 	var grid_height = 13;
 
-	var inventory_label = "Inventory: "
+	var inventory_label = "Inventory: ";
 	var inventory_x = ctx.measureText(inventory_label).width;
 	var inventory_y = 16 + 13 * 32 + 16;
+
+	var treasure_label = "Treasure: ";
+	var treasure_x = grid_x + grid_width * 32;
+	var treasure_y = 32;
 
 	var level = "level0";
 	var next_level = null;
 	var player_x = 0;
 	var player_y = 0;
 	var player_dir = 0;
-	var finish_x = grid_width - 1;
-	var finish_y = grid_height - 1;
 	var world = null;
 	var message = "";
+	var treasures = 0;
 
 	load_level = function(name)
 	{
@@ -220,6 +223,7 @@ function initGame()
 		next_level = null;
 		world = new Array();
 		message = "";
+		treasures = 0;
 
 		// Strip blank lines, newlines and leading whitespace from the map data
 		var mapdata = "";
@@ -264,7 +268,6 @@ function initGame()
 				var cell = getCell(x, y, 0, 0);
 				var critter = null;
 				if (cell == 's') { player_x = x; player_y = y; }
-				else if (cell == 'f') { finish_x = x; finish_y = y; }
 				else
 				{
 					critter = critterFromKey(cell);
@@ -285,6 +288,7 @@ function initGame()
 				world[x + y * grid_width] = {
 					"dirs" : dirs,
 					"cliff" : cell == 'c',
+					"treasure" : cell == 't',
 					"guardian" : critter,
 				};
 			}
@@ -321,6 +325,13 @@ function initGame()
 				message = target.guardian.no;
 				return;
 			}
+		}
+
+		if (target.treasure)
+		{
+			message = "Yoink! You grabbed some treasure.";
+			treasures = treasures + 1;
+			target.treasure = false;
 		}
 	
 		player_x = px;
@@ -387,10 +398,13 @@ function initGame()
 					{
 						ctx.drawImage(cell.guardian.sprite, x * 32, y * 32, 32, 32);
 					}
+					if (cell.treasure)
+					{
+						ctx.drawImage(tiles[TREASURE], x * 32, y * 32, 32, 32);
+					}
 				}
 			}
 		}
-		ctx.drawImage(tiles[TREASURE], finish_x * 32, finish_y * 32, 32, 32);
 		ctx.drawImage(player[player_dir], player_x * 32, player_y * 32, 32, 32);
 		ctx.translate(-grid_x, -grid_y);
 
@@ -406,6 +420,14 @@ function initGame()
 		}
 		ctx.fillText(inventory_label, -inventory_x, 0);
 		ctx.translate(-inventory_x, -inventory_y);
+
+		ctx.translate(treasure_x, treasure_y);
+		ctx.fillText(treasure_label, 0, 0);
+		for (var i = 0; i < treasures; ++i)
+		{
+			ctx.drawImage(tiles[TREASURE], 0, i * 32, 32, 32);
+		}
+		ctx.translate(-treasure_x, -treasure_y);
 	};
 
 	setInterval("update()", 16);
