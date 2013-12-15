@@ -408,7 +408,11 @@ function initGame()
 		if (y > 0 && contains(cell.dirs, DOWN)) { py = py + 1; }
 
 		var target = world[px + py * grid_width];
-		if (target.cliff && y < 0) { return; }
+		if (target.cliff && y < 0)
+		{
+			message = "Try as you might, you can't scrabble up the cliff";
+			return;
+		}
 
 		if (target.guardian)
 		{
