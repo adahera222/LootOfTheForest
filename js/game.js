@@ -465,7 +465,7 @@ function initGame()
 		player_x = px;
 		player_y = py;
 
-		if (cell.cliff)
+		if (cell.cliff && y > 0)
 		{
 			playSound("jump");
 		}
