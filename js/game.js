@@ -1,3 +1,6 @@
+/* Entry for Ludum Dare 28 - You Only Get One by Steve "moop" Barnett */
+/* Copyright 2013 Steve Barnett                                       */
+
 function loadSprite(url)
 {
 	var o = new Image();
