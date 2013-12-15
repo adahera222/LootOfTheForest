@@ -32,6 +32,8 @@ const RIGHT = 3;
 var update = null;
 var load_level = null;
 var move_player = null;
+var push_state = null;
+var pop_state = null;
 
 function initGame()
 {
@@ -82,7 +84,7 @@ function initGame()
 			"yes" : "You hand the hover shrew some plutonium and he flies off. You start to glow a little less.",
 			"no" : "He's low on fuel. You're not sure he could move out of your way even if he wanted to.",
 		},
-		"Molarbear" : {
+		"molarbear" : {
 			"name" : "Molar Bear",
 			"bribe" : "glacierminttoothpaste",
 			"sprite" : loadSprite("assets/MolarBear.png"),
@@ -215,6 +217,82 @@ function initGame()
 	var world = null;
 	var message = "";
 	var treasures = 0;
+	var undo_buffer = [];
+
+	push_state = function()
+	{
+		var worldState = [];
+		var bribeState = {};
+
+		for (var bribe in bribes)
+		{
+			bribeState[bribe] = bribes[bribe].used;
+		}
+
+		for (var x = 0; x < grid_width; ++x)
+		{
+			for (var y = 0; y < grid_height; ++y)
+			{
+				var cell = world[x + y * grid_width];
+				var guardian = null;
+				if (cell.guardian) { guardian = cell.guardian.key; }
+				treasure = cell.treasure;
+				var newCell = {
+					"x" : x,
+					"y" : y,
+					"guardian" : guardian,
+					"treasure" : treasure,
+				};
+				if (guardian || treasure)
+				{
+					worldState.push(newCell);
+				}
+			}
+		}
+	
+		var state = {
+			"player_x" : player_x,
+			"player_y" : player_y,
+			"player_dir" : player_dir,
+			"message" : message,
+			"treasures" : treasures,
+			"world" : worldState,
+			"bribes" : bribeState,
+		};
+		undo_buffer.push(state);
+	}
+
+	pop_state = function()
+	{
+		if (undo_buffer.length > 0)
+		{
+			var state = undo_buffer.pop(state);
+			player_x = state.player_x;
+			player_y = state.player_y;
+			player_dir = state.player_dir;
+			message = state.message;
+			treasures = state.treasures;
+			for (var bribe in state.bribes)
+			{
+				bribes[bribe].used = state.bribes[bribe];
+			}
+			var count = state.world.length;
+			for (var i = 0; i < count; ++i)
+			{
+				cell = state.world[i];
+				world[cell.x + cell.y * grid_width].guardian = creatures[critterFromKey(cell.guardian)];
+				world[cell.x + cell.y * grid_width].treasure = cell.treasure;
+			}
+			if (undo_buffer.length == 0)
+			{
+				push_state();
+			}
+		}
+		else
+		{
+			message = "Cannot undo any more actions!";
+		}
+	}
 
 	load_level = function(name)
 	{
@@ -224,6 +302,12 @@ function initGame()
 		world = new Array();
 		message = "";
 		treasures = 0;
+		undo_buffer = [];
+
+		for (var bribe in bribes)
+		{
+			bribes[bribe].used = false;
+		}
 
 		// Strip blank lines, newlines and leading whitespace from the map data
 		var mapdata = "";
@@ -293,6 +377,8 @@ function initGame()
 				};
 			}
 		}
+
+		push_state();
 	}
 	
 	load_level(level);
@@ -336,6 +422,8 @@ function initGame()
 	
 		player_x = px;
 		player_y = py;
+
+		push_state();
 	}
 
 	document.onkeypress = function(event)
@@ -355,6 +443,9 @@ function initGame()
 				break;
 			case 'd':
 				move_player(1, 0);
+				break;
+			case 'u':
+				pop_state();
 				break;
 		};
 	}
