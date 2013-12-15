@@ -217,7 +217,7 @@ function initGame()
 	var world = null;
 	var message = "";
 	var treasures = 0;
-	var treasure_goal = -1;
+	var treasure_goal = 0;
 	var undo_buffer = [];
 
 	push_state = function()
@@ -530,6 +530,11 @@ function initGame()
 			ctx.drawImage(tiles[TREASURE], 0, i * 32, 32, 32);
 		}
 		ctx.translate(-treasure_x, -treasure_y);
+
+		if (treasure_goal > 0 && treasures >= treasure_goal)
+		{
+			load_level(next_level);
+		}
 	};
 
 	setInterval("update()", 16);
