@@ -22,7 +22,7 @@ const HEDGE_NORTH = 3;
 const HEDGE_EAST = 4;
 const HEDGE_SOUTH = 5;
 const HEDGE_WEST = 6;
-const FINISH = 7;
+const TREASURE = 7;
 
 const UP = 0;
 const DOWN = 1;
@@ -55,7 +55,7 @@ function initGame()
 			"bribe" : "salmondom",
 			"sprite" : loadSprite("assets/BunnyBear.png"),
 			"key" : '1',
-			"yes" : "You palm the bunny bear the salmon flavoured condom you happened to be carrying. You feel much less of a creep now you're not carrying it around.",
+			"yes" : "You palm the bunny bear the salmon flavoured condom you happened to be carrying. You're glad to be rid of it.",
 			"no" : "Don't you judge me, the bunny bear says, and shakes his head at you.",
 		},
 		"fennecbox" : {
@@ -64,7 +64,7 @@ function initGame()
 			"sprite" : loadSprite("assets/FennecBox.png"),
 			"key" : '2',
 			"yes" : "You hand the jumbo QTip to the fennec box, he looks relieved and goes off to clean his giant ears.",
-			"no" : "He can't hear what you're saying, his giant ears are to stuffed up.",
+			"no" : "He can't hear what you're saying, his giant ears are too stuffed up.",
 		},
 		"flamingowl" : {
 			"name" : "Flamingowl",
@@ -80,7 +80,7 @@ function initGame()
 			"sprite" : loadSprite("assets/Hovershrew.png"),
 			"key" : '4',
 			"yes" : "You hand the hover shrew some plutonium and he flies off. You start to glow a little less.",
-			"no" : "He's low on fuel. You're not sure he could move out of your way if you want to.",
+			"no" : "He's low on fuel. You're not sure he could move out of your way even if he wanted to.",
 		},
 		"Molarbear" : {
 			"name" : "Molar Bear",
@@ -111,7 +111,7 @@ function initGame()
 			"bribe" : "bluebottletruffle",
 			"sprite" : loadSprite("assets/Wartfrog.png"),
 			"key" : '8',
-			"yes" : "You hand the wartfrog a bluebottle truffle and its eyes light up. You wipe your hands on some grass and walk off incase it's a messy eater.",
+			"yes" : "You hand the wartfrog a bluebottle truffle and its eyes light up. You wipe your hands on some grass and run off incase it's a messy eater.",
 			"no" : "You don't have anything to give the wartfrog but at least you're not carrying a bluebottle truffle any more. That thing was gross!",
 		},
 		"westernmeadowshark" : {
@@ -184,7 +184,7 @@ function initGame()
 	tiles[HEDGE_EAST] = loadSprite("assets/HedgeRight.png");
 	tiles[HEDGE_SOUTH] = loadSprite("assets/HedgeBottom.png");
 	tiles[HEDGE_WEST] = loadSprite("assets/HedgeLeft.png");
-	tiles[FINISH] = loadSprite("assets/Finish.png");
+	tiles[TREASURE] = loadSprite("assets/Treasure.png");
 
 	var player = [
 		loadSprite("assets/PlayerLeft.png"),
@@ -192,7 +192,7 @@ function initGame()
 	];
 
 	var status_x = 0;
-	var status_y = 0;
+	var status_y = 8;
 
 	var grid_x = 0;
 	var grid_y = 16;
@@ -305,18 +305,21 @@ function initGame()
 		if (y > 0 && contains(cell.dirs, DOWN)) { py = py + 1; }
 
 		var target = world[px + py * grid_width];
-		if (target.cliff && x < 0) { return; }
+		if (target.cliff && y < 0) { return; }
 
 		if (target.guardian)
 		{
 			var bribe = bribes[target.guardian.bribe];
 			if (bribe && !bribe.used)
 			{
-
+				message = target.guardian.yes;
+				bribe.used = true;
+				target.guardian = null;
 			}
 			else
 			{
-				
+				message = target.guardian.no;
+				return;
 			}
 		}
 	
@@ -351,6 +354,10 @@ function initGame()
 
 		if (!world) { return; }
 
+		ctx.translate(status_x, status_y);
+		ctx.fillText(message, 0, 0);
+		ctx.translate(-status_x, -status_y);
+
 		ctx.translate(grid_x, grid_y);
 		for (var x = 0; x < grid_width; ++x)
 		{
@@ -383,7 +390,7 @@ function initGame()
 				}
 			}
 		}
-		ctx.drawImage(tiles[FINISH], finish_x * 32, finish_y * 32, 32, 32);
+		ctx.drawImage(tiles[TREASURE], finish_x * 32, finish_y * 32, 32, 32);
 		ctx.drawImage(player[player_dir], player_x * 32, player_y * 32, 32, 32);
 		ctx.translate(-grid_x, -grid_y);
 
