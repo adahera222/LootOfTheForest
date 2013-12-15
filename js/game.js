@@ -115,9 +115,9 @@ function initGame()
 			"no" : "You don't have anything to give the wartfrog but at least you're not carrying a bluebottle truffle any more. That thing was gross!",
 		},
 		"westernmeadowshark" : {
-			"name" : "Western Meadow Shark",
+			"name" : "Western Meadowshark",
 			"bribe" : "surfboard",
-			"sprite" : loadSprite("assets/WesternMeadowShark.png"),
+			"sprite" : loadSprite("assets/WesternMeadowshark.png"),
 			"key" : '9',
 			"yes" : "Someone's logic may've gotten twisted here but the surfboard seems to satisfy the western meadowshark.",
 			"no" : "You have to be careful what you present to Oregon's state landshark. You decide it's better not to risk an inferior gift.",
