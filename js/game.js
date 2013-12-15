@@ -215,21 +215,18 @@ function initGame()
 		loadSprite("assets/PlayerRight.png"),
 	];
 
-	var status_x = 0;
-	var status_y = 8;
-
 	var grid_x = 0;
-	var grid_y = 16;
+	var grid_y = 0;
 	var grid_width = 16;
 	var grid_height = 13;
 
 	var inventory_label = "Inventory: ";
 	var inventory_x = ctx.measureText(inventory_label).width;
-	var inventory_y = 16 + 13 * 32 + 16;
+	var inventory_y = 13 * 32 + 16;
 
 	var treasure_label = "Treasure: ";
 	var treasure_x = grid_x + grid_width * 32;
-	var treasure_y = 32;
+	var treasure_y = 16;
 
 	var anim_counter = 0;
 
@@ -513,9 +510,7 @@ function initGame()
 
 		if (!world) { return; }
 
-		ctx.translate(status_x, status_y);
-		ctx.fillText(message, 0, 0);
-		ctx.translate(-status_x, -status_y);
+		document.getElementById("status").innerHTML = message;
 
 		ctx.translate(grid_x, grid_y);
 		for (var x = 0; x < grid_width; ++x)
