@@ -65,7 +65,7 @@ function initGame()
 			"bribe" : "jumboqtip",
 			"sprite" : loadSprite("assets/FennecBox.png"),
 			"key" : '2',
-			"yes" : "You hand the jumbo QTip to the fennec box, he looks relieved and goes off to clean his giant ears.",
+			"yes" : "You hand the jumbo QTip to the fennec box. He looks relieved and goes off to clean his giant ears.",
 			"no" : "He can't hear what you're saying, his giant ears are too stuffed up.",
 		},
 		"flamingowl" : {
@@ -121,7 +121,7 @@ function initGame()
 			"bribe" : "surfboard",
 			"sprite" : loadSprite("assets/WesternMeadowshark.png"),
 			"key" : '9',
-			"yes" : "Someone's logic may've gotten twisted here but the surfboard seems to satisfy the western meadowshark.",
+			"yes" : "Someone's logic may've gotten twisted here, but the surfboard seems to satisfy the western meadowshark.",
 			"no" : "You have to be careful what you present to Oregon's state landshark. You decide it's better not to risk an inferior gift.",
 		},
 	};
