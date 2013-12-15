@@ -18,6 +18,17 @@ function contains(array, val)
 	return false;
 }
 
+function playSound(id)
+{
+	try
+	{
+		var node = document.getElementById(id);
+		node.play();
+	}
+	catch (e)
+	{}
+}
+
 const PLAIN = 0;
 const BLOCKAGE = 1;
 const CLIFF = 2;
@@ -414,6 +425,7 @@ function initGame()
 		if (target.cliff && y < 0)
 		{
 			message = "Try as you might, you can't scrabble up the cliff";
+			playSound("fall");
 			return;
 		}
 
@@ -425,10 +437,12 @@ function initGame()
 				message = target.guardian.yes;
 				bribe.used = true;
 				target.guardian = null;
+				playSound("happy");
 			}
 			else
 			{
 				message = target.guardian.no;
+				playSound("slap");
 				return;
 			}
 		}
@@ -438,10 +452,20 @@ function initGame()
 			message = "Yoink! You grabbed some treasure.";
 			treasures = treasures + 1;
 			target.treasure = false;
+			playSound("pickup");
 		}
 	
 		player_x = px;
 		player_y = py;
+
+		if (cell.cliff)
+		{
+			playSound("jump");
+		}
+		else
+		{
+			playSound("step");
+		}
 
 		push_state();
 	}
