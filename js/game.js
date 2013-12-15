@@ -217,6 +217,7 @@ function initGame()
 	var world = null;
 	var message = "";
 	var treasures = 0;
+	var treasure_goal = -1;
 	var undo_buffer = [];
 
 	push_state = function()
@@ -317,6 +318,14 @@ function initGame()
 
 			while (data[idx] == '\t' || data[idx] == ' ' || data[idx] == '\n') { ++idx; };	// Trim leading whitespace
 			if (idx >= data.length) { return ""; }
+			if (data.substr(idx, 6) == "Next: ")
+			{
+				idx = idx + 6;
+				next_level = "";
+				while (data[idx] != '\t' && data[idx] != ' ' && data[idx] != '\n') { next_level = next_level + data[idx++]; };
+				while (data[idx] == '\t' || data[idx] == ' ' || data[idx] == '\n') { ++idx; };	// Trim more whitespace
+				return data.substr(idx);
+			}
 			while (data[idx] != '\n')
 			{
 				mapdata = mapdata + data[idx++];
@@ -375,6 +384,8 @@ function initGame()
 					"treasure" : cell == 't',
 					"guardian" : critter,
 				};
+
+				if (cell == 't') { ++treasure_goal; }
 			}
 		}
 
