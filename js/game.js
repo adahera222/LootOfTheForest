@@ -303,6 +303,7 @@ function initGame()
 		world = new Array();
 		message = "";
 		treasures = 0;
+		treasure_goal = 0;
 		undo_buffer = [];
 
 		for (var bribe in bribes)
