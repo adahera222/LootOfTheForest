@@ -299,6 +299,7 @@ function initGame()
 	{
 		var data = document.getElementsByName(name)[0].textContent;
 
+		level = name;
 		next_level = null;
 		world = new Array();
 		message = "";
@@ -458,6 +459,9 @@ function initGame()
 				break;
 			case 'u':
 				pop_state();
+				break;
+			case 'r':
+				load_level(level);
 				break;
 		};
 	}
