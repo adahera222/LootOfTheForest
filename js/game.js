@@ -8,6 +8,14 @@ function loadSprite(url)
 	return o;
 }
 
+function loadAnim(name)
+{
+	return [
+		loadSprite("assets/" + name + "_1.png"),
+		loadSprite("assets/" + name + "_2.png"),
+	];
+}
+
 function contains(array, val)
 {
 	const count = array.length;
@@ -61,7 +69,7 @@ function initGame()
 		"beegull" : {
 			"name" : "Bee Gull",
 			"bribe" : "honeyfries",
-			"sprite" : loadSprite("assets/BeeGull.png"),
+			"sprite" : loadAnim("BeeGull"),
 			"key" : '0',
 			"yes" : "The beegull jumps on you and steals the honey fries from your pocket. At least he's out of the way now.",
 			"no" : "No food, no pass! The beegull threatens you with its stinger and you back off.",
@@ -69,7 +77,7 @@ function initGame()
 		"bunnybear" : {
 			"name" : "Bunny Bear",
 			"bribe" : "salmondom",
-			"sprite" : loadSprite("assets/BunnyBear.png"),
+			"sprite" : loadAnim("BunnyBear"),
 			"key" : '1',
 			"yes" : "You palm the bunny bear the salmon flavoured condom you happened to be carrying. You're glad to be rid of it.",
 			"no" : "Don't you judge me, the bunny bear says, and shakes his head at you.",
@@ -77,7 +85,7 @@ function initGame()
 		"fennecbox" : {
 			"name" : "Fennec Box",
 			"bribe" : "jumboqtip",
-			"sprite" : loadSprite("assets/FennecBox.png"),
+			"sprite" : loadAnim("FennecBox"),
 			"key" : '2',
 			"yes" : "You hand the jumbo QTip to the fennec box. He looks relieved and goes off to clean his giant ears.",
 			"no" : "He can't hear what you're saying, his giant ears are too stuffed up.",
@@ -85,7 +93,7 @@ function initGame()
 		"flamingowl" : {
 			"name" : "Flamingowl",
 			"bribe" : "threebrinedmice",
-			"sprite" : loadSprite("assets/Flamingowl.png"),
+			"sprite" : loadAnim("Flamingowl"),
 			"key" : '3',
 			"yes" : "You hand the flamingowl the jar of three brined mice you had been saving for a special occasion and it lets you pass.",
 			"no" : "The flamingowl just stands there arguing with itself about brine shrimp and mice. It won't budge!",
@@ -93,7 +101,7 @@ function initGame()
 		"hovershrew" : {
 			"name" : "Hover Shrew",
 			"bribe" : "plutonium",
-			"sprite" : loadSprite("assets/Hovershrew.png"),
+			"sprite" : loadAnim("Hovershrew"),
 			"key" : '4',
 			"yes" : "You hand the hover shrew some plutonium and he flies off. You start to glow a little less.",
 			"no" : "He's low on fuel. You're not sure he could move out of your way even if he wanted to.",
@@ -101,7 +109,7 @@ function initGame()
 		"molarbear" : {
 			"name" : "Molar Bear",
 			"bribe" : "glacierminttoothpaste",
-			"sprite" : loadSprite("assets/MolarBear.png"),
+			"sprite" : loadAnim("MolarBear"),
 			"key" : '5',
 			"yes" : "You hand the molar bear a tube of glacier mint toothpaste. She looks happy but still terrifying. You slip past while she's distracted.",
 			"no" : "The molar bear bares her huge teeth at you. Her halitosis knocks you flat and you scrabble away to safety.",
@@ -109,7 +117,7 @@ function initGame()
 		"owlrus" : {
 			"name" : "Owlrus",
 			"bribe" : "mysterybox",
-			"sprite" : loadSprite("assets/Owlrus.png"),
+			"sprite" : loadAnim("Owlrus"),
 			"key" : '6',
 			"yes" : "What do owlruses like? Who knows? Whatever was in the mystery box it went down well.",
 			"no" : "You've no idea how to bribe an owlrus. Too bad!",
@@ -117,7 +125,7 @@ function initGame()
 		"polebat" : {
 			"name" : "Polebat",
 			"bribe" : "giftvoucher",
-			"sprite" : loadSprite("assets/Polebat.png"),
+			"sprite" : loadAnim("Polebat"),
 			"key" : '7',
 			"yes" : "You give the polebat a gift voucher. They're impossible to buy for!",
 			"no" : "You failed to find a suitable bribe for the polebat. It looks upset and slaps you with its wings.",
@@ -125,7 +133,7 @@ function initGame()
 		"wartfrog" : {
 			"name" : "Wartfrog",
 			"bribe" : "bluebottletruffle",
-			"sprite" : loadSprite("assets/Wartfrog.png"),
+			"sprite" : loadAnim("Wartfrog"),
 			"key" : '8',
 			"yes" : "You hand the wartfrog a bluebottle truffle and its eyes light up. You wipe your hands on some grass and run off incase it's a messy eater.",
 			"no" : "You don't have anything to give the wartfrog but at least you're not carrying a bluebottle truffle any more. That thing was gross!",
@@ -133,7 +141,7 @@ function initGame()
 		"westernmeadowshark" : {
 			"name" : "Western Meadowshark",
 			"bribe" : "surfboard",
-			"sprite" : loadSprite("assets/WesternMeadowshark.png"),
+			"sprite" : loadAnim("WesternMeadowshark"),
 			"key" : '9',
 			"yes" : "Someone's logic may've gotten twisted here, but the surfboard seems to satisfy the western meadowshark.",
 			"no" : "You have to be careful what you present to Oregon's state landshark. You decide it's better not to risk an inferior gift.",
@@ -222,6 +230,8 @@ function initGame()
 	var treasure_label = "Treasure: ";
 	var treasure_x = grid_x + grid_width * 32;
 	var treasure_y = 32;
+
+	var anim_counter = 0;
 
 	var level = "level0";
 	var next_level = null;
@@ -534,7 +544,7 @@ function initGame()
 					if (cell.cliff) { ctx.drawImage(tiles[CLIFF], x * 32, y * 32, 32, 32); }
 					if (cell.guardian != null)
 					{
-						ctx.drawImage(cell.guardian.sprite, x * 32, y * 32, 32, 32);
+						ctx.drawImage(cell.guardian.sprite[Math.floor(anim_counter / 30) % 2], x * 32, y * 32, 32, 32);
 					}
 					if (cell.treasure)
 					{
@@ -571,6 +581,8 @@ function initGame()
 		{
 			load_level(next_level);
 		}
+
+		++anim_counter;
 	};
 
 	setInterval("update()", 16);
