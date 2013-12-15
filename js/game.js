@@ -47,60 +47,80 @@ function initGame()
 			"bribe" : "honeyfries",
 			"sprite" : loadSprite("assets/BeeGull.png"),
 			"key" : '0',
+			"yes" : "The beegull jumps on you and steals the honey fries from your pocket. At least he's out of the way now.",
+			"no" : "No food, no pass! The beegull threatens you with its stinger and you back off.",
 		},
 		"bunnybear" : {
 			"name" : "Bunny Bear",
 			"bribe" : "salmondom",
 			"sprite" : loadSprite("assets/BunnyBear.png"),
 			"key" : '1',
+			"yes" : "You palm the bunny bear the salmon flavoured condom you happened to be carrying. You feel much less of a creep now you're not carrying it around.",
+			"no" : "Don't you judge me, the bunny bear says, and shakes his head at you.",
 		},
 		"fennecbox" : {
 			"name" : "Fennec Box",
 			"bribe" : "jumboqtip",
 			"sprite" : loadSprite("assets/FennecBox.png"),
 			"key" : '2',
+			"yes" : "You hand the jumbo QTip to the fennec box, he looks relieved and goes off to clean his giant ears.",
+			"no" : "He can't hear what you're saying, his giant ears are to stuffed up.",
 		},
 		"flamingowl" : {
 			"name" : "Flamingowl",
 			"bribe" : "threebrinedmice",
 			"sprite" : loadSprite("assets/Flamingowl.png"),
 			"key" : '3',
+			"yes" : "You hand the flamingowl the jar of three brined mice you had been saving for a special occasion and it lets you pass.",
+			"no" : "The flamingowl just stands there arguing with itself about brine shrimp and mice. It won't budge!",
 		},
 		"hovershrew" : {
 			"name" : "Hover Shrew",
 			"bribe" : "plutonium",
 			"sprite" : loadSprite("assets/Hovershrew.png"),
 			"key" : '4',
+			"yes" : "You hand the hover shrew some plutonium and he flies off. You start to glow a little less.",
+			"no" : "He's low on fuel. You're not sure he could move out of your way if you want to.",
 		},
 		"Molarbear" : {
 			"name" : "Molar Bear",
 			"bribe" : "glacierminttoothpaste",
 			"sprite" : loadSprite("assets/MolarBear.png"),
 			"key" : '5',
+			"yes" : "You hand the molar bear a tube of glacier mint toothpaste. She looks happy but still terrifying. You slip past while she's distracted.",
+			"no" : "The molar bear bares her huge teeth at you. Her halitosis knocks you flat and you scrabble away to safety.",
 		},
 		"owlrus" : {
 			"name" : "Owlrus",
-			"bribe" : "placeholder1",
+			"bribe" : "mysterybox",
 			"sprite" : loadSprite("assets/Owlrus.png"),
 			"key" : '6',
+			"yes" : "What do owlruses like? Who knows? Whatever was in the mystery box it went down well.",
+			"no" : "You've no idea how to bribe an owlrus. Too bad!",
 		},
 		"polebat" : {
 			"name" : "Polebat",
-			"bribe" : "placeholder2",
+			"bribe" : "giftvoucher",
 			"sprite" : loadSprite("assets/Polebat.png"),
 			"key" : '7',
+			"yes" : "You give the polebat a gift voucher. They're impossible to buy for!",
+			"no" : "You failed to find a suitable bribe for the polebat. It looks upset and slaps you with its wings.",
 		},
 		"wartfrog" : {
 			"name" : "Wartfrog",
 			"bribe" : "bluebottletruffle",
 			"sprite" : loadSprite("assets/Wartfrog.png"),
 			"key" : '8',
+			"yes" : "You hand the wartfrog a bluebottle truffle and its eyes light up. You wipe your hands on some grass and walk off incase it's a messy eater.",
+			"no" : "You don't have anything to give the wartfrog but at least you're not carrying a bluebottle truffle any more. That thing was gross!",
 		},
 		"westernmeadowshark" : {
 			"name" : "Western Meadow Shark",
-			"bribe" : "placeholder3",
+			"bribe" : "surfboard",
 			"sprite" : loadSprite("assets/WesternMeadowShark.png"),
 			"key" : '9',
+			"yes" : "Someone's logic may've gotten twisted here but the surfboard seems to satisfy the western meadowshark.",
+			"no" : "You have to be careful what you present to Oregon's state landshark. You decide it's better not to risk an inferior gift.",
 		},
 	};
 
@@ -138,20 +158,20 @@ function initGame()
 			"sprite" : loadSprite("assets/GlacierMintToothpaste.png"),
 			"used" : false,
 		},
-		"placeholder1" : {
-			"sprite" : loadSprite("assets/Owlrus.png"),
+		"mysterybox" : {
+			"sprite" : loadSprite("assets/MysteryBox.png"),
 			"used" : false,
 		},
-		"placeholder2" : {
-			"sprite" : loadSprite("assets/Polebat.png"),
+		"giftvoucher" : {
+			"sprite" : loadSprite("assets/GiftVoucher.png"),
 			"used" : false,
 		},
 		"bluebottletruffle" : {
 			"sprite" : loadSprite("assets/BluebottleTruffle.png"),
 			"used" : false,
 		},
-		"placeholder3" : {
-			"sprite" : loadSprite("assets/WesternMeadowShark.png"),
+		"surfboard" : {
+			"sprite" : loadSprite("assets/Surfboard.png"),
 			"used" : false,
 		},
 	};
@@ -191,6 +211,7 @@ function initGame()
 	var finish_x = grid_width - 1;
 	var finish_y = grid_height - 1;
 	var world = null;
+	var message = "";
 
 	load_level = function(name)
 	{
@@ -198,6 +219,7 @@ function initGame()
 
 		next_level = null;
 		world = new Array();
+		message = "";
 
 		// Strip blank lines, newlines and leading whitespace from the map data
 		var mapdata = "";
@@ -274,10 +296,32 @@ function initGame()
 	move_player = function(x, y)
 	{
 		var cell = world[player_x + player_y * grid_width];
-		if (x < 0 && contains(cell.dirs, LEFT)) { player_x = player_x - 1; player_dir = 0; }
-		if (x > 0 && contains(cell.dirs, RIGHT)) { player_x = player_x + 1; player_dir = 1; }
-		if (y < 0 && contains(cell.dirs, UP)) { player_y = player_y - 1; }
-		if (y > 0 && contains(cell.dirs, DOWN)) { player_y = player_y + 1; }
+		var px = player_x;
+		var py = player_y;
+
+		if (x < 0 && contains(cell.dirs, LEFT)) { px = px - 1; player_dir = 0; }
+		if (x > 0 && contains(cell.dirs, RIGHT)) { px = px + 1; player_dir = 1; }
+		if (y < 0 && contains(cell.dirs, UP)) { py = py - 1; }
+		if (y > 0 && contains(cell.dirs, DOWN)) { py = py + 1; }
+
+		var target = world[px + py * grid_width];
+		if (target.cliff && x < 0) { return; }
+
+		if (target.guardian)
+		{
+			var bribe = bribes[target.guardian.bribe];
+			if (bribe && !bribe.used)
+			{
+
+			}
+			else
+			{
+				
+			}
+		}
+	
+		player_x = px;
+		player_y = py;
 	}
 
 	document.onkeypress = function(event)
