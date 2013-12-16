@@ -486,10 +486,16 @@ function initGame()
 			case 'w':
 				move_player(0, -1);
 				break;
+			case 'z':	// AZERTY support
+				move_player(0, -1);
+				break;
 			case 's':
 				move_player(0, 1);
 				break;
 			case 'a':
+				move_player(-1, 0);
+				break;
+			case 'q':	// AZERTY support
 				move_player(-1, 0);
 				break;
 			case 'd':
